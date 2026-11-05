@@ -1,0 +1,51 @@
+---
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  articleDate?: string;
+  author?: string;
+  isArticle?: boolean;
+  category?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  image,
+  articleDate,
+  author,
+  isArticle = false,
+  category,
+  tags = [],
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      articleDate={articleDate}
+      author={author}
+      isArticle={isArticle}
+      category={category}
+      tags={tags}
+    />
+  </head>
+  <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
+    <Header />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

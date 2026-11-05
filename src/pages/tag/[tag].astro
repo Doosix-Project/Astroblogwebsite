@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getAllPosts, slugify } from '../../utils/blog';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  const tagMap = new Map<string, { tagName: string; posts: typeof posts }>();
+
+  posts.forEach((post) => {
+    post.data.tags.forEach((tag) => {
+      const slug = slugify(tag);
+      const existing = tagMap.get(slug) || { tagName: tag, posts: [] };
+      existing.posts.push(post);
+      tagMap.set(slug, existing);
+    });
+  });
+
+  return Array.from(tagMap.entries()).map(([slug, { tagName, posts }]) => ({
+    params: { tag: slug },
+    props: {
+      tagName,
+      posts,
+    },
+  }));
+}
+
+const { tagName, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`#${tagName} Technical Guides`}
+  description={`Articles and tutorials tagged with #${tagName}.`}
+  image="/images/og-default.svg"
+  tags={[tagName]}
+>
+  <!-- Tag Page Header -->
+  <section class="bg-white border-b border-slate-200/80 pt-10 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <nav class="flex items-center gap-2 text-xs text-slate-500 mb-4" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+        <span>/</span>
+        <a href="/blog" class="hover:text-blue-600 transition-colors">Tags</a>
+        <span>/</span>
+        <span class="text-slate-400 font-semibold">#{tagName}</span>
+      </nav>
+
+      <div class="max-w-3xl">
+        <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+          Tag Archive
+        </span>
+        <h1 class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+          #{tagName}
+        </h1>
+        <p class="mt-2 text-slate-600 text-base">
+          Found {posts.length} {posts.length === 1 ? 'article' : 'articles'} matching this tag.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Content Grid: 2 Columns + Sidebar -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      <section class="lg:col-span-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {posts.map((post) => (
+            <ArticleCard post={post} />
+          ))}
+        </div>
+      </section>
+
+      <div class="lg:col-span-4">
+        <Sidebar showAuthor={true} />
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

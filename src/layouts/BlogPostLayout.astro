@@ -1,0 +1,224 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import { formatDate } from '../utils/blog';
+
+export interface Props {
+  post: CollectionEntry<'blog'>;
+  headings: { depth: number; slug: string; text: string }[];
+  relatedPosts?: CollectionEntry<'blog'>[];
+}
+
+const { post, headings, relatedPosts = [] } = Astro.props;
+const currentUrl = Astro.url.href;
+
+const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+  'AI & LLMs': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200' },
+  'DevOps & Cloud': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  'Open Source': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'Architecture': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+};
+
+const badgeStyle = categoryColors[post.data.category] || {
+  bg: 'bg-slate-50',
+  text: 'text-slate-700',
+  border: 'border-slate-200',
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={post.data.heroImage || '/images/og-default.svg'}
+  articleDate={post.data.pubDate.toISOString()}
+  author={post.data.author}
+  isArticle={true}
+  category={post.data.category}
+  tags={post.data.tags}
+>
+  <!-- Article Header / Breadcrumbs -->
+  <section class="bg-white border-b border-slate-200/80 pt-8 pb-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumb navigation for SEO -->
+      <nav class="flex items-center gap-2 text-xs text-slate-500 mb-6" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+        <span>/</span>
+        <a href="/blog" class="hover:text-blue-600 transition-colors">Blog</a>
+        <span>/</span>
+        <a href={`/category/${post.data.category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} class="hover:text-blue-600 transition-colors">
+          {post.data.category}
+        </a>
+        <span>/</span>
+        <span class="text-slate-400 line-clamp-1 max-w-[200px]">{post.data.title}</span>
+      </nav>
+
+      <div class="max-w-4xl">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <span class={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border ${badgeStyle.bg} ${badgeStyle.text} ${badgeStyle.border}`}>
+            {post.data.category}
+          </span>
+          <span class="text-xs text-slate-500 flex items-center gap-1.5">
+            <time datetime={post.data.pubDate.toISOString()}>
+              {formatDate(post.data.pubDate)}
+            </time>
+            <span>•</span>
+            <span>{post.data.readingTime}</span>
+          </span>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+          {post.data.title}
+        </h1>
+
+        <p class="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+          {post.data.description}
+        </p>
+
+        <!-- Author Banner -->
+        <div class="mt-6 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img
+              src={post.data.authorAvatar}
+              alt={post.data.author}
+              width="44"
+              height="44"
+              class="w-11 h-11 rounded-full ring-2 ring-blue-100"
+            />
+            <div>
+              <p class="text-sm font-bold text-slate-900">{post.data.author}</p>
+              <p class="text-xs text-slate-500">{post.data.authorRole}</p>
+            </div>
+          </div>
+
+          <ShareButtons title={post.data.title} url={currentUrl} />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Article Main Grid: 2 Columns (Content + Sticky Sidebar) -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      <!-- Article Content (8 columns) -->
+      <article class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-10 shadow-xs overflow-hidden">
+        
+        {post.data.heroImage && (
+          <div class="mb-8 rounded-xl overflow-hidden border border-slate-200/80 aspect-[16/9] bg-slate-50">
+            <img
+              src={post.data.heroImage}
+              alt={post.data.title}
+              width="800"
+              height="450"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
+        <!-- Markdown HTML Output -->
+        <div class="prose-custom max-w-none">
+          <slot />
+        </div>
+
+        <!-- Tags List -->
+        <div class="mt-10 pt-6 border-t border-slate-100">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Filed under</h3>
+          <div class="flex flex-wrap gap-2">
+            {post.data.tags.map((tag) => (
+              <a
+                href={`/tag/${tag.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                class="px-3 py-1 text-xs font-medium bg-slate-50 text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors"
+              >
+                #{tag}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Article Bottom Share & Author Callout -->
+        <div class="mt-10 p-6 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img
+              src={post.data.authorAvatar}
+              alt={post.data.author}
+              width="48"
+              height="48"
+              class="w-12 h-12 rounded-full ring-2 ring-blue-200"
+            />
+            <div>
+              <p class="text-sm font-bold text-slate-900">{post.data.author}</p>
+              <p class="text-xs text-slate-500">Enjoyed this analysis? Share it with your engineering team.</p>
+            </div>
+          </div>
+          <ShareButtons title={post.data.title} url={currentUrl} />
+        </div>
+
+        <!-- Related Articles Section -->
+        {relatedPosts.length > 0 && (
+          <div class="mt-12 pt-8 border-t border-slate-200">
+            <h3 class="text-lg font-bold text-slate-900 mb-6">Related Technical Guides</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {relatedPosts.map((rel) => (
+                <a
+                  href={`/blog/${rel.id}`}
+                  class="p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-xs transition-all bg-white group block"
+                >
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block mb-1">
+                    {rel.data.category}
+                  </span>
+                  <h4 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {rel.data.title}
+                  </h4>
+                  <p class="text-xs text-slate-500 mt-1 line-clamp-1">{rel.data.readingTime}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </article>
+
+      <!-- Sticky Sidebar (4 columns) -->
+      <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+        
+        <!-- Table of Contents -->
+        <TableOfContents headings={headings} />
+
+        <!-- Coolify / Self-Hosting Quick Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-xs">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs uppercase font-bold tracking-wider text-blue-400">Coolify Deployment</span>
+            <span class="px-2 py-0.5 text-[10px] bg-blue-500/20 text-blue-300 rounded border border-blue-500/30 font-semibold">Guide</span>
+          </div>
+          <h4 class="text-sm font-bold text-white">Deploy this blog to your own VPS in 5 minutes</h4>
+          <p class="mt-1.5 text-xs text-slate-300 leading-relaxed">
+            Follow our step-by-step Coolify walkthrough for automated Git builds and free SSL.
+          </p>
+          <a
+            href="/blog/coolify-self-hosting-modern-infrastructure"
+            class="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300"
+          >
+            Read Coolify Tutorial →
+          </a>
+        </div>
+
+        <!-- Back to All Articles -->
+        <a
+          href="/blog"
+          class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-xs"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to all articles
+        </a>
+
+      </aside>
+
+    </div>
+  </section>
+</BaseLayout>

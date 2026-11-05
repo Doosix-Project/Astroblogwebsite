@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/HeroSection.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getAllPosts } from '../utils/blog';
+
+const allPosts = await getAllPosts();
+
+// Primary featured post & secondary post for hero grid
+const featuredPost = allPosts.find((p) => p.data.featured) || allPosts[0];
+const secondaryPost = allPosts.find((p) => p.id !== featuredPost.id && p.data.featured) || allPosts[1];
+
+// Latest articles (excluding the main featured post in hero)
+const latestArticles = allPosts.filter((p) => p.id !== featuredPost.id);
+---
+
+<BaseLayout
+  title="DevPulse // Modern Tech Engineering Blog"
+  description="High-performance engineering publication covering Agentic AI, Kubernetes GitOps, self-hosted cloud infrastructure with Coolify, and open-source tooling."
+  image="/images/og-default.svg"
+>
+  <!-- Hero Section Grid Layout -->
+  <HeroSection featuredPost={featuredPost} secondaryPost={secondaryPost} />
+
+  <!-- Main Content Area: Latest Articles (2 Columns) + Sidebar -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      <!-- Left Column: Latest Articles (8 columns on large screens) -->
+      <section class="lg:col-span-8" aria-label="Latest Technical Articles">
+        
+        <div class="flex items-center justify-between pb-4 mb-8 border-b border-slate-200">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">
+              Latest Articles
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              In-depth tutorials, real-world case studies, and engineering blueprints
+            </p>
+          </div>
+
+          <a
+            href="/blog"
+            class="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1"
+          >
+            View all ({allPosts.length})
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- 2-Column Article Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {latestArticles.map((post, idx) => (
+            <ArticleCard post={post} preloadImage={idx < 2} />
+          ))}
+        </div>
+
+        <!-- Bottom Explorer Callout -->
+        <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50 to-white border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Explore by Category</h3>
+            <p class="text-xs text-slate-600 mt-0.5">Filter our library across AI, DevOps, Open Source, and Architecture.</p>
+          </div>
+          <a
+            href="/blog"
+            class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors whitespace-nowrap shadow-xs"
+          >
+            Browse All Posts →
+          </a>
+        </div>
+
+      </section>
+
+      <!-- Right Column: Sidebar (4 columns on large screens) -->
+      <div class="lg:col-span-4">
+        <Sidebar showAuthor={true} />
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

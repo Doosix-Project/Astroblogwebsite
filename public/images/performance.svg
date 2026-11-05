@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgPerf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="50%" stop-color="#065f46" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bgPerf)" rx="16" />
+  <!-- 4 Lighthouse 100 circles -->
+  <g transform="translate(130, 160)">
+    <circle cx="50" cy="50" r="48" fill="#022c22" stroke="#10b981" stroke-width="6" />
+    <text x="50" y="58" fill="#34d399" font-family="sans-serif" font-weight="bold" font-size="26" text-anchor="middle">100</text>
+    <text x="50" y="125" fill="#a7f3d0" font-family="sans-serif" font-size="14" font-weight="600" text-anchor="middle">Performance</text>
+  </g>
+  <g transform="translate(270, 160)">
+    <circle cx="50" cy="50" r="48" fill="#022c22" stroke="#10b981" stroke-width="6" />
+    <text x="50" y="58" fill="#34d399" font-family="sans-serif" font-weight="bold" font-size="26" text-anchor="middle">100</text>
+    <text x="50" y="125" fill="#a7f3d0" font-family="sans-serif" font-size="14" font-weight="600" text-anchor="middle">Accessibility</text>
+  </g>
+  <g transform="translate(410, 160)">
+    <circle cx="50" cy="50" r="48" fill="#022c22" stroke="#10b981" stroke-width="6" />
+    <text x="50" y="58" fill="#34d399" font-family="sans-serif" font-weight="bold" font-size="26" text-anchor="middle">100</text>
+    <text x="50" y="125" fill="#a7f3d0" font-family="sans-serif" font-size="14" font-weight="600" text-anchor="middle">Best Practices</text>
+  </g>
+  <g transform="translate(550, 160)">
+    <circle cx="50" cy="50" r="48" fill="#022c22" stroke="#10b981" stroke-width="6" />
+    <text x="50" y="58" fill="#34d399" font-family="sans-serif" font-weight="bold" font-size="26" text-anchor="middle">100</text>
+    <text x="50" y="125" fill="#a7f3d0" font-family="sans-serif" font-size="14" font-weight="600" text-anchor="middle">SEO</text>
+  </g>
+</svg>
